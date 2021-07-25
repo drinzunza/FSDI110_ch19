@@ -39,3 +39,17 @@ python3 server.py
 # deactivate the virtual env
 deactivate
 
+
+
+
+
+# check status / start mongoDB service
+sudo service mongodb status
+sudo service mongodb start
+
+
+# MongoDB Shell
+show dbs
+use <dbName>
+show collections
+db.<collection>.find({})

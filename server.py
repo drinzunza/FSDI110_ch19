@@ -3,6 +3,7 @@ from flask import Flask, abort, request, render_template
 from data import data
 import json
 from flask_cors import CORS
+from config import db, parse_json
 
 app = Flask(__name__)
 CORS(app)
@@ -41,15 +42,17 @@ def full_name():
 
 @app.route("/api/catalog")
 def get_catalog():   
-    return json.dumps(products)
+    cursor = db.products.find({})
+    catalog = [item for item in cursor]    
+    return parse_json(catalog)
 
 
 
 @app.route("/api/catalog", methods=['POST'])
 def save_product():    
     prod = request.get_json()
-    products.append(prod)
-    return json.dumps(prod)
+    db.products.insert(prod)
+    return parse_json(prod)
 
     
 
@@ -77,65 +80,38 @@ def get_cheapest():
 
 @app.route("/api/catalog/<category>")
 def get_product_by_category(category):    
-    results = []
-    for prod in products:
-        if(prod["category"].lower() == category.lower()):
-            results.append(prod)
-
-    return json.dumps(results)    
+    data = db.products.find({ "category": category })
+    results = [item for item in data]
+    return parse_json(results)
 
 
 
 @app.route("/api/categories")
 def get_categories():
+    data = db.products.find({})
     unique_categories = []
     # do the magic
-    for prod in products:
+    for prod in data:
         cat = prod["category"]
 
         # how to check if an element exist inside a list in python
         if cat not in unique_categories:
             unique_categories.append(cat)
             print(cat)
-    return json.dumps(unique_categories)
+    return parse_json(unique_categories)
 
 
 
 @app.route("/api/test")
-def test(): 
+def test_data_manipulation(): 
+    test_data = db.test.find({})
+    print(test_data)
 
-    # add
-    products.append("strawberry")
-    products.append("dragon fruit")
+    return parse_json(test_data[0])
 
-    # length
-    print(f"You have: {len(products)} products in your catalog" )
-
-    # iterate
-    for fruit in products:
-        print(fruit)
-
-
-    # print an string 10 times
-    for i in range(0, 10, 1):
-        print(i)
-
-
-    # remove apple from products
-    # print the list
-    products.remove("apple")
-    for f in products:
-        print(products)
-
-
-    return "Check your terminal"
 
 
 #if __name__ == '__main__':
-#    app.run(debug=True)
-
-
-
-
+# app.run(debug=True)
 # adding some awesome code that will fix everything
 # another change
