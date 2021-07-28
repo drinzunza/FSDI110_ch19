@@ -86,6 +86,16 @@ def get_product_by_category(category):
 
 
 
+@app.route("/api/discountCode/<code>")
+def validate_discount(code):
+    data = db.coupoCodes.find({"code": code})
+    for code in data:
+        return parse_json(code)
+
+    return parse_json({"error": True, "reason": "Invalid Code"})
+
+
+
 @app.route("/api/categories")
 def get_categories():
     data = db.products.find({})
@@ -108,6 +118,18 @@ def test_data_manipulation():
     print(test_data)
 
     return parse_json(test_data[0])
+
+
+
+
+@app.route("/test/populatecodes")
+def test_populate_codes():
+    db.coupoCodes.insert({"code": "qwerty", "discount": 10 })
+    db.coupoCodes.insert({"code": "ploop", "discount": 7 })
+    db.coupoCodes.insert({"code": "cheaper", "discount": 5 })
+    db.coupoCodes.insert({"code": "abab1212", "discount": 95 })
+
+    return "Codes registered"
 
 
 
